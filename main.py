@@ -1,4 +1,3 @@
-##god why do i have to import so many fucking libraries 
 import board
 import rotaryio
 import digitalio
@@ -11,29 +10,29 @@ from adafruit_hid.consumer_control_code import ConsumerControlCode
 ##line of code in the entire program
 cc = ConsumerControl(usb_hid.devices)
 
-
+##sets up the rotary encoder to handle directional control
 knob = rotaryio.IncrementalEncoder(board.D3, board.D4)
 last_pos = 0
 
-
+##sets up various buttons
 playPause = digitalio.DigitalInOut(board.D0)
 playPause.direction = digitalio.Direction.INPUT
 playPause.switch_to_input(pull = digitalio.pull.DOWN)
 playPausePrevState = playPause.value
 
-
+##cont'd button setup
 nextTrack = digitalio.DigitalInOut(board.D1)
 nextTrack.direction = digitalio.Direction.INPUT
 nextTrack.switch_to_input(pull = digitalio.pull.DOWN)
 nextTrackPrevState = nextTrack.value
 
-    
+##cont'd button setup
 previousTrack = digitalio.DigitalInOut(board.D2)
 previousTrack.direction = digitalio.Direction.INPUT
 previousTrack.switch_to_input(pull = digitalio.pull.DOWN)
 previousTrackPrevState = previousTrack.value
 
-print("new reading!")
+print("now reading!")
 
 ##dictionary #1 to set up what two states we have
 stateList = [
@@ -45,23 +44,26 @@ stateList = [
     }
 ]
 
-##whichever state we are NOT in gets put in this dictionary
-notCurrentState = []
+##whichever state we are NOT in gets put in this list
+notCurrState = []
 ##moves the state we are not utilizing away from action
-notCurrentState.append(stateList.pop(0))
+notCurrState.append(stateList.pop(0))
 
 while True:
-##checks to see a variation of rotary encoder reading
+##checks to see if variation of rotary encoder reading
     current_pos = knob.position
     if last_pos == 0 or current_pos != last_pos:
         print(current_pos)
 
+        ##volume up
         if current_pos > last_pos:
             for i in range(5):
                 cc.send(ConsumerControlCode.VOLUME_INCREMENT)
+        ##volume down
         if current_pos < last_pos:
             for i in range(5):
                 cc.send(ConsumerControlCode.VOLUME_DECREMENT)
+    ##sets the current position relative to itself
     last_pos = current_pos
 
 ##will play or pause track
